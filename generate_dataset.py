@@ -46,8 +46,8 @@ if __name__ == "__main__":
         with open("data/data.txt",'r') as file:
             for line in file:
                 line = cleanup(line)
-                new_line = combine_sentences(line,sentences)
-                new_line = delete_augment(new_line)
+                line = combine_sentences(line,sentences)
+                new_line = delete_augment(line)
                 new_line = replace_augment(new_line)
                 new_line = new_line.lower() # train to reconstruct capitalization
                 new_line = new_line.replace(",","").replace(".","").replace("!","").replace("?","")
