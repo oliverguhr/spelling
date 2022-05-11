@@ -11,7 +11,7 @@ def delete_augment(text, char_delete_percentage=0.02):
     return "".join(modifyed_line)
 
 
-def replace_augment(text, char_replacement_percentage=0.03):
+def replace_augment(text, char_replacement_percentage=0.02):
     replacement_count = int(len(text)*char_replacement_percentage)
     chars_to_replace = random.sample(range(len(text)), replacement_count)
     new_chars = random.choices(ascii_letters, k=replacement_count)
@@ -21,7 +21,7 @@ def replace_augment(text, char_replacement_percentage=0.03):
         modifyed_line[char_index] = new_chars[i]
     return "".join(modifyed_line)
 
-clean_chars = re.compile(r'[^A-Za-zöäüÖÄÜß,.!?’\'“$%€0-9\(\)\- ]', re.MULTILINE)
+clean_chars = re.compile(r'[^A-Za-zöäüÖÄÜß,.!?’\'$%€0-9\(\)\- ]', re.MULTILINE)
 
 def cleanup(text):    
     text = clean_chars.sub('', text)
@@ -40,7 +40,7 @@ def combine_sentences(text, sentences, augmentation_probability = 0.5):
 if __name__ == "__main__":
     with open("data/data.txt",'r') as file:
         sentences = file.readlines(80000)
-        sentences = [cleanup(sentence) for sentence in sentences]
+        sentences = [cleanup(sentence) for sentence in sentences if len(sentence) < 60]
     
     with open("de.csv","w",encoding='utf-8') as output:        
         with open("data/data.txt",'r') as file:
