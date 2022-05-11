@@ -29,8 +29,8 @@ def cleanup(text):
     #text = text.replace('"','\\"')
     return text
 
-def combine_sentences(text, sentences, augmentation_probability = 0.5):
-    if random.random() > augmentation_probability:
+def combine_sentences(text, sentences, augmentation_probability = 0.4):
+    if random.random() > augmentation_probability and len(text) < 150:
         sentences_to_sample = random.randint(1,3)
         augmentation_sentences = random.sample(sentences,sentences_to_sample)    
         return text + " " + " ".join(augmentation_sentences)
