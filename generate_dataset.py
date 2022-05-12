@@ -1,7 +1,17 @@
+from lib2to3.pgen2.tokenize import tokenize
 import random 
-from string import ascii_letters
+from string import ascii_letters, punctuation
 import re
 import os
+from transformers import AutoTokenizer
+from tqdm import tqdm
+
+def tokenizer_check_if_text_too_long(text, tokenizer):
+    data = tokenizer.batch_encode_plus([text],max_length=1024,truncation=True,return_overflowing_tokens=True )    
+    if len(data["input_ids"]) > 1:
+        return True
+    else:
+        return False#, len(data["input_ids"][0])
 
 def delete_characters(text, char_delete_percentage=0.02):
     modifyed_line = []   
@@ -22,16 +32,20 @@ def replace_augment(text, char_replacement_percentage=0.02):
     return "".join(modifyed_line)
 
 clean_chars = re.compile(r'[^A-Za-zöäüÖÄÜß,.!?’\'$%€0-9\(\)\- ]', re.MULTILINE)
-
 def cleanup(text):    
     text = clean_chars.sub('', text)
     #text = text.replace("\n", "")
     #text = text.replace('"','\\"')
     return text
 
-def combine_sentences(text, sentences, augmentation_probability = 0.5):
-    if random.random() < augmentation_probability and len(text) < 150:
-        sentences_to_sample = random.randint(1,3)
+clean_punctuation = re.compile(r"(?<!\d)[.,;:'?!](?!\d)")
+def remove_punctuation(text):
+    """Remove all punctuation from string, except if it's between digits"""
+    return clean_punctuation.sub("", text)
+
+def combine_sentences(text, sentences, augmentation_probability = 1):
+    if random.random() < augmentation_probability:
+        sentences_to_sample = random.randint(1,10)
         augmentation_sentences = random.sample(sentences,sentences_to_sample)    
         return text + " " + " ".join(augmentation_sentences)
     else:
@@ -48,22 +62,30 @@ def delete_word(text, augmentation_probability = 0.05):
 
 
 if __name__ == "__main__":
-    with open("data/data.txt",'r') as file:
-        sentences = file.readlines(100000)
-        sentences = [cleanup(sentence) for sentence in sentences if len(sentence) < 60]
+    data_file = "data/data.txt"
+    language = "en"
+    num_lines = sum(1 for line in open(data_file,'r'))
+
+    with open(data_file,'r') as file:
+        sentences = file.readlines(int(num_lines*0.5))
+        sentences = [cleanup(sentence) for sentence in sentences]
     
-    with open("en.csv","w",encoding='utf-8') as output:        
-        with open("data/data.txt",'r') as file:
-            for line in file:
+    tokenizer = AutoTokenizer.from_pretrained("facebook/bart-base")
+    with open(language+".csv","w",encoding='utf-8') as output:        
+        with open(data_file,'r') as file:
+            for line in tqdm(file, total=num_lines):
                 line = cleanup(line)
-                line = combine_sentences(line,sentences)
+                line = combine_sentences(line,sentences)                
+                if tokenizer_check_if_text_too_long(line,tokenizer):
+                    print("text too long ({len(line)}):\n"+line)
+                
                 new_line = delete_word(line)
                 new_line = delete_characters(new_line)
                 new_line = replace_augment(new_line)
                 new_line = new_line.lower() # train to reconstruct capitalization
-                new_line = new_line.replace(",","").replace(".","").replace("!","").replace("?","")
+                new_line = remove_punctuation(new_line)
                 output.write(f'"{new_line.strip()}","{line.strip()}"\n')        
-    os.system("echo \"text,summary\" > en.train.csv")
-    os.system("head -n 100000 en.csv >> en.train.csv")
-    os.system("echo \"text,summary\" > en.test.csv")
-    os.system("tail -n 10000 en.csv >> en.test.csv")
+    os.system(f"echo \"text,summary\" > {language}.train.csv")
+    os.system("head -n 100000 {language}.csv >> {language}.train.csv")
+    os.system("echo \"text,summary\" > {language}.test.csv")
+    os.system("tail -n 10000 {language}.csv >> {language}.test.csv")
