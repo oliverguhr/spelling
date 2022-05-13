@@ -570,7 +570,7 @@ def main():
     )
 
     # Metric
-    metric = load_metric("rouge")
+    metric = load_metric("cer")
 
     def postprocess_text(preds, labels):
         preds = [pred.strip() for pred in preds]
@@ -595,14 +595,15 @@ def main():
         # Some simple post-processing
         decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
 
-        result = metric.compute(predictions=decoded_preds, references=decoded_labels, use_stemmer=True)
+        result = metric.compute(predictions=decoded_preds, references=decoded_labels)
         # Extract a few results from ROUGE
-        result = {key: value.mid.fmeasure * 100 for key, value in result.items()}
+        #esult = {key: value.mid.fmeasure * 100 for key, value in result.items()}
 
-        prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
-        result["gen_len"] = np.mean(prediction_lens)
-        result = {k: round(v, 4) for k, v in result.items()}
-        return result
+        #prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+        #result["gen_len"] = np.mean(prediction_lens)
+        #result = {k: round(v, 4) for k, v in result.items()}        
+        #return result
+        return {"cer": result}
 
     # Initialize our Trainer
     trainer = Seq2SeqTrainer(
