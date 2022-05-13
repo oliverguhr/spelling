@@ -1,6 +1,6 @@
 from lib2to3.pgen2.tokenize import tokenize
 import random 
-from string import ascii_letters, punctuation
+from string import ascii_letters, punctuation, digits
 import re
 import os
 from transformers import AutoTokenizer
@@ -16,19 +16,33 @@ def tokenizer_check_if_text_too_long(text, tokenizer):
 def delete_characters(text, char_delete_percentage=0.02):
     modifyed_line = []   
     for char in text:
-        if random.random() > char_delete_percentage:
+        if random.random() > char_delete_percentage and char not in digits:
             modifyed_line.append(char)
     return "".join(modifyed_line)
 
+def insert_characters(text, augmentation_probability=0.01):
+    modifyed_line = []   
+    for char in text:
+        if random.random() <= augmentation_probability and char not in digits:            
+            modifyed_line.append(random.choice(ascii_letters))
+        modifyed_line.append(char)
+    return "".join(modifyed_line)
 
-def replace_augment(text, char_replacement_percentage=0.02):
-    replacement_count = int(len(text)*char_replacement_percentage)
-    chars_to_replace = random.sample(range(len(text)), replacement_count)
-    new_chars = random.choices(ascii_letters, k=replacement_count)
+def replace_characters(text, augmentation_probability=0.01):
+    modifyed_line = []   
+    for char in text:
+        if random.random() <= augmentation_probability and char not in digits:            
+            modifyed_line.append(random.choice(ascii_letters))
+        else:
+            modifyed_line.append(char)
+    return "".join(modifyed_line)
 
-    modifyed_line = list(text)
-    for i, char_index in enumerate(chars_to_replace):
-        modifyed_line[char_index] = new_chars[i]
+def swap_characters_case(text, augmentation_probability=0.05):
+    modifyed_line = []   
+    for char in text:
+        if random.random() <= augmentation_probability:            
+            char = char.swapcase()
+        modifyed_line.append(char)
     return "".join(modifyed_line)
 
 clean_chars = re.compile(r'[^A-Za-zöäüÖÄÜß,.!?’\'$%€0-9\(\)\- ]', re.MULTILINE)
@@ -51,7 +65,7 @@ def combine_sentences(text, sentences, augmentation_probability = 1):
     else:
         return text
 
-def delete_word(text, augmentation_probability = 0.05):
+def delete_word(text, augmentation_probability = 0.005):
     if random.random() < augmentation_probability:
         words = text.split()
         word_to_remove = random.randint(0,len(words)-1)
@@ -81,11 +95,16 @@ if __name__ == "__main__":
                 
                 new_line = delete_word(line)
                 new_line = delete_characters(new_line)
-                new_line = replace_augment(new_line)
-                new_line = new_line.lower() # train to reconstruct capitalization
+                new_line = insert_characters(new_line)
+                new_line = replace_characters(new_line)
+                new_line = swap_characters_case(new_line)                
+                #new_line = new_line.lower() # train to reconstruct capitalization
                 new_line = remove_punctuation(new_line)
                 output.write(f'"{new_line.strip()}","{line.strip()}"\n')        
     os.system(f"echo \"text,summary\" > {language}.train.csv")
     os.system(f"head -n 299000 {language}.csv >> {language}.train.csv")
     os.system(f"echo \"text,summary\" > {language}.test.csv")
     os.system(f"tail -n 1000 {language}.csv >> {language}.test.csv")
+
+
+
