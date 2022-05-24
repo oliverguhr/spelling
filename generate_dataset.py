@@ -13,7 +13,7 @@ def tokenizer_check_if_text_too_long(text, tokenizer):
     else:
         return False#, len(data["input_ids"][0])
 
-def delete_characters(text, char_delete_percentage=0.02):
+def delete_characters(text, char_delete_percentage=0.01):
     modifyed_line = []   
     for char in text:
         if random.random() > char_delete_percentage and char not in digits:
@@ -59,13 +59,13 @@ def remove_punctuation(text):
 
 def combine_sentences(text, sentences, augmentation_probability = 1):
     if random.random() < augmentation_probability:
-        sentences_to_sample = random.randint(1,10)
+        sentences_to_sample = random.randint(0,10)
         augmentation_sentences = random.sample(sentences,sentences_to_sample)    
         return text + " " + " ".join(augmentation_sentences)
     else:
         return text
 
-def delete_word(text, augmentation_probability = 0.005):
+def delete_word(text, augmentation_probability = 0.001):
     if random.random() < augmentation_probability:
         words = text.split()
         word_to_remove = random.randint(0,len(words)-1)
@@ -77,7 +77,7 @@ def delete_word(text, augmentation_probability = 0.005):
 
 if __name__ == "__main__":
     data_file = "data/data.txt"
-    language = "en"
+    language = "de"
     num_lines = sum(1 for line in open(data_file,'r'))
 
     with open(data_file,'r') as file:
@@ -93,13 +93,15 @@ if __name__ == "__main__":
                 if tokenizer_check_if_text_too_long(line,tokenizer):
                     print("text too long ({len(line)}):\n"+line)
                 
-                new_line = delete_word(line)
-                new_line = delete_characters(new_line)
-                new_line = insert_characters(new_line)
-                new_line = replace_characters(new_line)
-                new_line = swap_characters_case(new_line)                
-                #new_line = new_line.lower() # train to reconstruct capitalization
-                new_line = remove_punctuation(new_line)
+                if random.random() >0.1:
+                    # we will leave 10% of the data untouched, to teach the 
+                    # model, not to "overact" on the texts
+                    new_line = delete_word(line)
+                    new_line = delete_characters(new_line)
+                    new_line = insert_characters(new_line)
+                    new_line = replace_characters(new_line)
+                    new_line = swap_characters_case(new_line)                                
+                    new_line = remove_punctuation(new_line)
                 output.write(f'"{new_line.strip()}","{line.strip()}"\n')        
     os.system(f"echo \"text,summary\" > {language}.train.csv")
     os.system(f"head -n 299000 {language}.csv >> {language}.train.csv")
