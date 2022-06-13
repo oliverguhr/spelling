@@ -77,7 +77,7 @@ def delete_word(text, augmentation_probability = 0.001):
 
 if __name__ == "__main__":
     data_file = "data/data.txt"
-    language = "de"
+    language = "en"
     num_lines = sum(1 for line in open(data_file,'r'))
 
     with open(data_file,'r') as file:
