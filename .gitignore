@@ -5,3 +5,4 @@ __pycache__/
 data/data.txt
 *.csv
 unused/
+publish
