@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is an attempet to create a model that is able to fix spelling errors and 
+This is an attempt to create a model that is able to fix spelling errors and 
 common typos. 
 
 An english work in progress model and interactive demo can be found [here](https://huggingface.co/oliverguhr/spelling-correction-english-base) and a german version [here](https://huggingface.co/oliverguhr/spelling-correction-german-base).
