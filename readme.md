@@ -21,13 +21,12 @@ To generate the training data simply run these two scripts:
 2. `python generate_dataset.py`
 
 By default this will create the english dataset. To switch to a different language, 
-you need to change the language tag in those two scripts. The language tag should be a 
-commandline argument, pull request are welcome.
+you need to change the language tag in those two scripts.
 
 
 ## How to train a model:
 
-For english type `sh train_bart_model.sh` or `train_de_bart_model.sh` for the german model.
+For english run `sh train_bart_model.sh` or `train_de_bart_model.sh` for the german model.
 
 ## Contribute:
 
@@ -35,7 +34,7 @@ This is an open research project, improvements and contributions are welcome.
 If we achive promising results, we will publish them in a more formal way (paper). 
 All contributers will be recognized.
 
-## Posible Datasets:
+## Possible Datasets:
 
 * https://github.com/snukky/wikiedits
 * https://github.com/mhagiwara/github-typo-corpus
