@@ -20,7 +20,7 @@ To generate the training data simply run these two scripts:
 1. `sh convert_leipzig_data.sh`
 2. `python generate_dataset.py`
 
-Optional: If you want to combine multiple datasets you can edit and run the "combine.sh" script.
+Optional: If you want to combine multiple languages you can edit and run the "combine.sh" script.
 
 
 By default this will create the english dataset. To switch to a different language, 
