@@ -90,13 +90,13 @@ def delete_word(text, augmentation_probability = 0.001):
 
 
 if __name__ == "__main__":
-    data_file = "data/data.txt"
-    language = "en"
+    data_file = "data/data.en.txt" #"data/en.wikidump.processed.24m.txt" #
+    language = "en" # "wikidump.24m.en"
     num_lines = sum(1 for line in open(data_file,'r'))
 
-    #with open(data_file,'r') as file:
-    #    sentences = file.readlines(int(num_lines*0.5))
-    #    sentences = [cleanup(sentence) for sentence in sentences]
+    with open(data_file,'r') as file:
+        sentences = file.readlines(int(num_lines*0.5))
+        sentences = [cleanup(sentence) for sentence in sentences]
     
     tokenizer = AutoTokenizer.from_pretrained("facebook/bart-base")
     with open(language+".csv","w",encoding='utf-8') as output:        
