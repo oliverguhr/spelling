@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 line = cleanup(line)
                 if len(line) < 1:
                     continue 
-                #line = combine_sentences(line,sentences)                
+                line = combine_sentences(line,sentences)                
                 if tokenizer_check_if_text_too_long(line,tokenizer,max_length=1024):
                     print(f"skipping line as its too long ({len(line)}):\n"+line)
                     continue
