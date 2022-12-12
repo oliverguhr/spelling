@@ -37,6 +37,12 @@ This is an open research project, improvements and contributions are welcome.
 If we achive promising results, we will publish them in a more formal way (paper). 
 All contributers will be recognized.
 
+## Open Questions
+
+* How do evaluate the quality of the model, apart from using CER on syntactic data?
+* What are good data sets to train on?
+
+
 ## Possible Datasets:
 
 * https://github.com/snukky/wikiedits
